@@ -1,0 +1,8 @@
+{
+  "name": "react-native-dapp-template",
+  "version": "0.0.1",
+  "description": "React Native Dapp Template",
+  "repository": "https://github.com/marcusglaze/react-native-dapp-template.git",
+  "author": "Marcus Glaze <marcusglz94@gmail.com>",
+  "license": "MIT"
+}
