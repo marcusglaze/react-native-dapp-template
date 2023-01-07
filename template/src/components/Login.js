@@ -1,39 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
     View,
     Text,
     Button
-} from 'react-native';
-import { useWalletConnect } from '@walletconnect/react-native-dapp';
+} from 'react-native'
+import { useDispatch } from 'react-redux';
+import { 
+  loadConnector,
+  connectWallet
+} from '../store/actions';
 
 const Login = ({ navigation }) => {
 
+    const dispatch = useDispatch();
     const [isConnected, setIsConnected] = useState(false);
 
-    const connector = useWalletConnect();
-  
-    const authenticateUser = async () => {
-      try {
-        if (connector.connected) {
-          setIsConnected(true);
-          navigation.navigate("Home");
-        } else {
-          const session = await connector.connect();
-          setIsConnected(true);
-          navigation.navigate("Home");
-        }  
-      } catch (error) {
-        console.log(error);
-      }
+    const connector = loadConnector(dispatch);
+        
+    const loadAccountHandler = async () => {
+      const success = await connectWallet(connector, dispatch);
+      setIsConnected(success);
     }
 
-    {/* add disconnect button here to not over complicate the template */}
-    const logUserOut = async () => {
-        await connector.killSession();
-        setIsConnected(false);
-    }
-  
+    useEffect(() => {
+      if (isConnected) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        });
+      }
+    }, [isConnected])
+
     return (
       <SafeAreaView>
         <View className="flex-center items-center justify-center h-screen">
@@ -41,15 +39,11 @@ const Login = ({ navigation }) => {
                 <Text className="text-3xl font-bold">React Native Dapp Login</Text>
             </View>
             <View className="p-4 mt-10 bg-blue-300 rounded-full">
-                {!isConnected ? (
-                    <Button title="Connect wallet" onPress={authenticateUser} />
-                ) : (
-                    <Button title="Disconnect" onPress={logUserOut} />
-                )}
+              <Button title="Connect wallet" onPress={loadAccountHandler} />
             </View>
         </View>
       </SafeAreaView>
     );
 }
 
-export default Login
+export default Login;
